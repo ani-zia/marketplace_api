@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "marketplace_api"
+version = "1.0"
+description = "Simple Marketplace API"
+authors = ["Анна Симанова <ani.simanova@yandex.ru>"]
+readme = "README.md"
+packages = [{include = "*", from = "app"}, {include = "**/*.py", from = "."}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "0.92.0"
+uvicorn = {extras = ["standard"], version = "^0.20.0"}
+pre-commit = "^3.0.4"
+
+
+[tool.poetry.group.dev.dependencies]
+taskipy = "^1.10.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.taskipy.tasks]
+start = "uvicorn app.main:app --reload"
