@@ -2,7 +2,8 @@ from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):
-    app_title: str
+    app_title: str = "Marketplace API"
+    database_url: str
 
     class Config:
         env_file = ".env"
