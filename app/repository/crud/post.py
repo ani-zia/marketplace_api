@@ -13,7 +13,6 @@ class CRUDPost(CRUDBase):
         self, post_id: int, session: AsyncSession
     ) -> Optional[Post]:
         db_post = await session.get(Post, post_id)
-        print(db_post)
         return db_post
 
     async def update_post(
@@ -29,7 +28,7 @@ class CRUDPost(CRUDBase):
         await session.refresh(db_post)
         return db_post
 
-    async def delete_post(self, db_post: Post, session: AsyncSession):
+    async def delete_post(self, db_post: Post, session: AsyncSession) -> Post:
         await session.delete(db_post)
         await session.commit()
         return db_post

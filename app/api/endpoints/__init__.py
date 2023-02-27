@@ -1,1 +1,1 @@
-from .posts import router as posts_router  # noqa
+from .post import router as post_router  # noqa

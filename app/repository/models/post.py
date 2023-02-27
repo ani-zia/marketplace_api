@@ -1,4 +1,5 @@
 from sqlalchemy import TIMESTAMP, Boolean, Column, Integer, String, Text, func
+from sqlalchemy.orm import relationship
 
 from app.core.db import Base
 
@@ -17,3 +18,4 @@ class Post(Base):
         nullable=False,
         onupdate=func.current_timestamp(),
     )
+    comments = relationship("Comment", cascade="delete")
