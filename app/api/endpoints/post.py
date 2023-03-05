@@ -1,21 +1,26 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.validators import check_post_exist
+from app.api.validators import check_post_before_edit, check_post_exist
 from app.core.db import get_async_session
 from app.core.user import current_user
 from app.repository.crud.comment import comment_crud
 from app.repository.crud.post import post_crud
 from app.repository.models import User
-from app.repository.schemas.comment import CommentCreate, CommentDB
-from app.repository.schemas.post import PostCreate, PostDB, PostUpdate
+from app.repository.schemas import (
+    CommentCreate,
+    CommentDB,
+    PostCreate,
+    PostDB,
+    PostUpdate,
+)
 
 router = APIRouter()
 
 
 @router.get("/", response_model=list[PostDB])
 async def get_all_posts(session: AsyncSession = Depends(get_async_session)):
-    all_posts = await post_crud.get_multi(session)
+    all_posts = await post_crud.get_posts(session)
     return all_posts
 
 
@@ -42,17 +47,20 @@ async def partially_update_posts(
     post_id: int,
     req_post: PostUpdate,
     session: AsyncSession = Depends(get_async_session),
+    author: User = Depends(current_user),
 ):
-    post_db = await check_post_exist(post_id, session)
+    post_db = await check_post_before_edit(post_id, session, author)
     updated_post = await post_crud.update_post(req_post, post_db, session)
     return updated_post
 
 
-@router.delete("/{post_id}", response_model=PostDB)
+@router.delete("/{post_id}")
 async def remove_post(
-    post_id: int, session: AsyncSession = Depends(get_async_session)
+    post_id: int,
+    session: AsyncSession = Depends(get_async_session),
+    author: User = Depends(current_user),
 ):
-    post_db = await check_post_exist(post_id, session)
+    post_db = await check_post_before_edit(post_id, session, author)
     deleted_post = await post_crud.delete_post(post_db, session)
     return deleted_post
 

@@ -1,15 +1,17 @@
+from typing import Optional
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repository.crud.base import CRUDBase
 from app.repository.models import Comment, User
-from app.repository.schemas.comment import CommentCreate
+from app.repository.schemas import CommentCreate
 
 
 class CommentCRUD(CRUDBase):
     async def get_comments_by_post(
         self, post_id: int, session: AsyncSession
-    ) -> list[Comment]:
+    ) -> Optional[list[Comment]]:
         comments = await session.execute(
             select(Comment).where(Comment.post_id == post_id)
         )

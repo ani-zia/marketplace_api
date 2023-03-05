@@ -1,11 +1,12 @@
 from typing import Optional
 
 from fastapi.encoders import jsonable_encoder
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repository.crud.base import CRUDBase
 from app.repository.models import Post, User
-from app.repository.schemas.post import PostCreate, PostUpdate
+from app.repository.schemas import PostCreate, PostUpdate
 
 
 class CRUDPost(CRUDBase):
@@ -15,9 +16,13 @@ class CRUDPost(CRUDBase):
         db_post = await session.get(Post, post_id)
         return db_post
 
+    async def get_posts(self, session: AsyncSession) -> Optional[list[Post]]:
+        db_posts = await session.execute(select(self.model))
+        return db_posts.scalars().all()
+
     async def create_post(
         self, post_in: PostCreate, session: AsyncSession, author: User
-    ):
+    ) -> Post:
         post_in_data = post_in.dict()
         db_post = self.model(**post_in_data, author_id=author.id)
         session.add(db_post)

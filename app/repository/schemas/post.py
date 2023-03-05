@@ -27,7 +27,9 @@ class PostUpdate(PostBase):
         return value
 
 
-class PostDB(PostCreate):
+class PostDB(PostBase):
+    title: str = Field(..., min_length=2, max_length=128)
+    price: NonNegativeInt
     is_active: bool
     created_at: datetime
     updated_at: datetime

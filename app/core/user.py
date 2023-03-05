@@ -18,7 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
 from app.core.db import get_async_session
 from app.repository.models import User
-from app.repository.schemas.user import UserCreate
+from app.repository.schemas import UserCreate
 
 
 async def get_user_db(session: AsyncSession = Depends(get_async_session)):
@@ -45,9 +45,10 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         password: str,
         user: Union[UserCreate, User],
     ) -> None:
-        if len(password) < 3:
+        if len(password) < settings.password_min_length:
             raise InvalidPasswordException(
-                reason="Password should be at least 3 characters"
+                reason="Password should be at least "
+                f"{settings.password_min_length} characters"
             )
         if user.email in password:
             raise InvalidPasswordException(
@@ -57,7 +58,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
     async def on_after_register(
         self, user: User, request: Optional[Request] = None
     ):
-        print(f"Пользователь {user.email} зарегистрирован.")
+        print(f"The user {user.email} is registered.")
 
 
 async def get_user_manager(user_db=Depends(get_user_db)):
