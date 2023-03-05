@@ -1,4 +1,13 @@
-from sqlalchemy import TIMESTAMP, Boolean, Column, Integer, String, Text, func
+from sqlalchemy import (
+    TIMESTAMP,
+    Boolean,
+    Column,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    func,
+)
 from sqlalchemy.orm import relationship
 
 from app.core.db import Base
@@ -19,3 +28,7 @@ class Post(Base):
         onupdate=func.current_timestamp(),
     )
     comments = relationship("Comment", cascade="delete")
+    author_id = Column(
+        Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False
+    )
+    author = relationship("User", lazy="joined")

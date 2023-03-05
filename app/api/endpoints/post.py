@@ -3,8 +3,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.validators import check_post_exist
 from app.core.db import get_async_session
+from app.core.user import current_user
 from app.repository.crud.comment import comment_crud
 from app.repository.crud.post import post_crud
+from app.repository.models import User
 from app.repository.schemas.comment import CommentCreate, CommentDB
 from app.repository.schemas.post import PostCreate, PostDB, PostUpdate
 
@@ -27,9 +29,11 @@ async def get_post(
 
 @router.post("/", response_model=PostDB)
 async def create_new_posts(
-    post: PostCreate, session: AsyncSession = Depends(get_async_session)
+    post: PostCreate,
+    session: AsyncSession = Depends(get_async_session),
+    author: User = Depends(current_user),
 ):
-    new_post = await post_crud.create(post, session)
+    new_post = await post_crud.create_post(post, session, author)
     return new_post
 
 
@@ -58,10 +62,11 @@ async def create_new_comment(
     post_id: int,
     comment: CommentCreate,
     session: AsyncSession = Depends(get_async_session),
+    author: User = Depends(current_user),
 ):
     await check_post_exist(post_id, session)
     comment.post_id = post_id
-    new_comment = await comment_crud.create(comment, session)
+    new_comment = await comment_crud.create_comment(comment, session, author)
     return new_comment
 
 

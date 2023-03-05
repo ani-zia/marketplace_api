@@ -14,6 +14,7 @@ class CommentCreate(CommentBase):
 
 class CommentDB(CommentBase):
     created_at: datetime
+    author: int
 
     class Config:
         orm_mode = True

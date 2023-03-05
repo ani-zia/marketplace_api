@@ -9,3 +9,4 @@ class Comment(Base):
         TIMESTAMP, server_default=func.current_timestamp(), nullable=False
     )
     post_id = Column(Integer, ForeignKey("post.id"))
+    author = Column(Integer, ForeignKey("user.id"))

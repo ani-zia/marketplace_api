@@ -3,6 +3,8 @@ from typing import Optional
 
 from pydantic import BaseModel, Field, NonNegativeInt, validator
 
+from app.repository.schemas.user import UserReadPost
+
 
 class PostBase(BaseModel):
     title: Optional[str] = Field(None, min_length=2, max_length=128)
@@ -29,6 +31,7 @@ class PostDB(PostCreate):
     is_active: bool
     created_at: datetime
     updated_at: datetime
+    author: UserReadPost
 
     class Config:
         orm_mode = True
