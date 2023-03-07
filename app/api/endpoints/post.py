@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends
+from fastapi_pagination import paginate
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.pagination import Page, Params
 from app.api.validators import check_post_before_edit, check_post_exist
 from app.core.db import get_async_session
 from app.core.user import current_user
@@ -18,10 +20,13 @@ from app.repository.schemas import (
 router = APIRouter()
 
 
-@router.get("/", response_model=list[PostDB])
-async def get_all_posts(session: AsyncSession = Depends(get_async_session)):
+@router.get("/", response_model=Page[PostDB])
+async def get_all_posts(
+    session: AsyncSession = Depends(get_async_session),
+    params: Params = Depends(),
+):
     all_posts = await post_crud.get_posts(session)
-    return all_posts
+    return paginate(all_posts, params)
 
 
 @router.get("/{post_id}", response_model=PostDB)
@@ -65,7 +70,7 @@ async def remove_post(
     return deleted_post
 
 
-@router.post("/{post_id}/comments", response_model=CommentDB)
+@router.post("/{post_id}/comments", response_model=Page[CommentDB])
 async def create_new_comment(
     post_id: int,
     comment: CommentCreate,
@@ -78,10 +83,12 @@ async def create_new_comment(
     return new_comment
 
 
-@router.get("/{post_id}/comments", response_model=list[CommentDB])
+@router.get("/{post_id}/comments", response_model=Page[CommentDB])
 async def get_all_comments(
-    post_id: int, session: AsyncSession = Depends(get_async_session)
+    post_id: int,
+    session: AsyncSession = Depends(get_async_session),
+    params: Params = Depends(),
 ):
     await check_post_exist(post_id, session)
     all_comments = await comment_crud.get_comments_by_post(post_id, session)
-    return all_comments
+    return paginate(all_comments, params)
