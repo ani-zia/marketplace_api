@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, Depends
 from fastapi_pagination import paginate
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -26,6 +28,7 @@ async def get_all_posts(
     params: Params = Depends(),
 ):
     all_posts = await post_crud.get_posts(session)
+    logging.info("Extract posts from DB")
     return paginate(all_posts, params)
 
 
@@ -34,6 +37,7 @@ async def get_post(
     post_id: int, session: AsyncSession = Depends(get_async_session)
 ):
     db_post = await check_post_exist(post_id, session)
+    logging.info(f"Get post with id {db_post.id} from DB")
     return db_post
 
 
@@ -44,6 +48,7 @@ async def create_new_posts(
     author: User = Depends(current_user),
 ):
     new_post = await post_crud.create_post(post, session, author)
+    logging.info(f"Create new post with id {new_post.id}")
     return new_post
 
 
@@ -56,6 +61,7 @@ async def partially_update_posts(
 ):
     post_db = await check_post_before_edit(post_id, session, author)
     updated_post = await post_crud.update_post(req_post, post_db, session)
+    logging.info(f"Update post with id {updated_post.id}")
     return updated_post
 
 
@@ -67,6 +73,7 @@ async def remove_post(
 ):
     post_db = await check_post_before_edit(post_id, session, author)
     deleted_post = await post_crud.delete_post(post_db, session)
+    logging.info(f"Delete post with id {deleted_post.id}")
     return deleted_post
 
 
@@ -80,6 +87,7 @@ async def create_new_comment(
     await check_post_exist(post_id, session)
     comment.post_id = post_id
     new_comment = await comment_crud.create_comment(comment, session, author)
+    logging.info(f"Create comment with id {new_comment.id}")
     return new_comment
 
 
@@ -91,4 +99,5 @@ async def get_all_comments(
 ):
     await check_post_exist(post_id, session)
     all_comments = await comment_crud.get_comments_by_post(post_id, session)
+    logging.info("Extract comments from DB")
     return paginate(all_comments, params)
