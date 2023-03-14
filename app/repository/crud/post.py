@@ -13,8 +13,10 @@ class CRUDPost(CRUDBase):
     async def get_post_by_id(
         self, post_id: int, session: AsyncSession
     ) -> Optional[Post]:
-        db_post = await session.get(Post, post_id)
-        return db_post
+        db_post = await session.execute(
+            select(self.model).where(self.model.id == post_id)
+        )
+        return db_post.scalars().first()
 
     async def get_posts(self, session: AsyncSession) -> Optional[list[Post]]:
         db_posts = await session.execute(select(self.model))

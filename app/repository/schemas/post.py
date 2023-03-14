@@ -8,7 +8,7 @@ from app.repository.schemas.user import UserReadPost
 
 class PostBase(BaseModel):
     title: Optional[str] = Field(None, min_length=2, max_length=128)
-    description: Optional[str] = Field(None, min_length=1)
+    description: Optional[str]
     price: Optional[NonNegativeInt]
 
 
