@@ -1,0 +1,36 @@
+version: '3.8'
+
+
+services:
+  db:
+    image: postgres:14.5-alpine
+    restart: always
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=marketplace_db
+      - POSTGRES_USER=marketplace_user
+      - POSTGRES_PASSWORD=marketplace
+    ports:
+      - "5432:5432"
+
+  web:
+    build: .
+    command: bash -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    restart: always
+    ports:
+     - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - POSTGRES_DB=marketplace_db
+      - POSTGRES_USER=marketplace_user
+      - POSTGRES_PASSWORD=marketplace
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DATABASE_URL=postgresql+asyncpg://marketplace_user:marketplace@db:5432/marketplace_db
+      - SECRET=MAGIC
+
+
+volumes:
+  postgres-data:
