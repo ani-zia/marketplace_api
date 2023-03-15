@@ -5,7 +5,7 @@ Simple online marketplace based on FastAPI framework
 
 ### Installing
 ```bash
-https://github.com/ani-zia/marketplace_api.git
+git clone https://github.com/ani-zia/marketplace_api.git
 ```
 
 ```bash
