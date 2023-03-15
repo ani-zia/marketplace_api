@@ -77,7 +77,7 @@ async def remove_post(
     return deleted_post
 
 
-@router.post("/{post_id}/comments", response_model=Page[CommentDB])
+@router.post("/{post_id}/comments", response_model=CommentDB)
 async def create_new_comment(
     post_id: int,
     comment: CommentCreate,

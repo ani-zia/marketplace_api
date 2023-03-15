@@ -14,16 +14,16 @@ async def test_root(client):
     assert response.status_code == HTTPStatus.NOT_FOUND
 
 
-async def test_get_all_posts(authorized_client, test_posts):
+async def test_get_all_posts(client, test_posts):
     def validate(post):
         return PostDB(**post)
 
     posts_list = []
-    response_for_total = await authorized_client.get("/posts/")
+    response_for_total = await client.get("/posts/")
     response_total = response_for_total.json()["total"]
     page = 1
     for __ in range(0, response_total + 1, PAGINATION_DEFAULT):
-        chunk_response = await authorized_client.get(
+        chunk_response = await client.get(
             f"/posts/?page={page}&size={PAGINATION_DEFAULT}"
         )
         page += 1

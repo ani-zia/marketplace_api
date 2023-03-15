@@ -9,7 +9,7 @@ from sqlalchemy.orm import sessionmaker
 
 from app.core.db import Base, get_async_session
 from app.main import main_router
-from app.repository.models import Post
+from app.repository.models import Comment, Post
 
 
 @pytest.fixture(scope="session")
@@ -149,3 +149,43 @@ async def test_posts(db_session, test_user, test_user2):
     await db_session.commit()
     db_posts = await db_session.execute(select(Post))
     return db_posts.scalars().all()
+
+
+@pytest.fixture
+async def test_comments(db_session, test_posts, test_user, test_user2):
+    post_id = test_posts[0].id
+    comments_data = [
+        {
+            "comment": "1st comment",
+            "post_id": post_id,
+            "author": test_user["id"],
+        },
+        {
+            "comment": "2nd comment",
+            "post_id": post_id,
+            "author": test_user2["id"],
+        },
+        {
+            "comment": "3rd comment",
+            "post_id": post_id,
+            "author": test_user["id"],
+        },
+        {
+            "comment": "4th comment",
+            "post_id": post_id,
+            "author": test_user2["id"],
+        },
+        {
+            "comment": "5th comment",
+            "post_id": post_id,
+            "author": test_user["id"],
+        },
+    ]
+    for comment in comments_data:
+        comment_db = Comment(**comment)
+        db_session.add(comment_db)
+    await db_session.commit()
+    db_comment = await db_session.execute(
+        select(Comment).where(Comment.post_id == post_id)
+    )
+    return db_comment.scalars().all()
